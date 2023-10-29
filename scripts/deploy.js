@@ -6,28 +6,20 @@
 // global scope, and execute the script.
 const hre = require("hardhat");
 
-async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+// Define an async function to handle deployment
+async function deploy() {
+  // Obtain the Soulbound contract
+  const Soulbound = await hre.ethers.getContractFactory("Soulbound");
+  // Deploy the Soulbound contract
+  const soulbound = await Soulbound.deploy();
 
-  const lockedAmount = hre.ethers.parseEther("0.001");
+  // wait for the transaction to mine
+  await soulbound.waitForDeployment();
 
-  const lock = await hre.ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
-
-  await lock.waitForDeployment();
-
-  console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
-  );
+  // Log the deployed contract's address
+  console.log("Soulbound token deployed at:", soulbound.target);
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+deploy()
+  .then(() => console.log("Deployment complete"))
+  .catch((error) => console.error("Error deploying contract:", error));
