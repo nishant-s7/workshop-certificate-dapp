@@ -8,16 +8,16 @@ const hre = require("hardhat");
 
 // Define an async function to handle deployment
 async function deploy() {
-  // Obtain the Soulbound contract
-  const Soulbound = await hre.ethers.getContractFactory("Soulbound");
-  // Deploy the Soulbound contract
-  const soulbound = await Soulbound.deploy();
+  // Obtain the MultiToken contract
+  const MultiToken = await hre.ethers.getContractFactory("MultiToken");
+  // Deploy the MultiToken contract
+  const multiToken = await MultiToken.deploy();
 
   // wait for the transaction to mine
-  await soulbound.waitForDeployment();
+  await multiToken.waitForDeployment();
 
   // Log the deployed contract's address
-  console.log("Soulbound token deployed at:", soulbound.target);
+  console.log("multiToken token deployed at:", multiToken.target);
 }
 
 deploy()
