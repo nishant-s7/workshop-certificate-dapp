@@ -1,15 +1,16 @@
 import { useSDK } from "@metamask/sdk-react";
 import { useState } from "react";
 
-const Metamask = ({ setMetamaskConnected }) => {
+const Metamask = ({ setMetamaskConnected, setAddress }) => {
   const [account, setAccount] = useState();
-  const { sdk, connected, connecting, chainId } = useSDK();
+  const { sdk, connected, chainId } = useSDK();
   const [buttonText, setButtonText] = useState("Connect");
 
   const connect = async () => {
     try {
       const accounts = await sdk?.connect();
       setAccount(accounts?.[0]);
+      setAddress(accounts?.[0]);
       setMetamaskConnected(true);
       setButtonText("Metamask Connected");
     } catch (err) {
