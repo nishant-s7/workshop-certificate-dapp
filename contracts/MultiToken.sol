@@ -5,9 +5,8 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract MultiToken is ERC1155, Ownable {
+contract MultiToken is ERC1155 {
     constructor()
-        Ownable(msg.sender)
         ERC1155(
             "https://ipfs.io/ipfs/QmNoRJAgUie29jxtX4ZkbaA582wJNeRE6e56eCCAk82NCH/{id}.json"
         )
@@ -28,7 +27,7 @@ contract MultiToken is ERC1155, Ownable {
         uint256 id,
         uint256 amount,
         bytes memory data
-    ) public onlyOwner {
+    ) public {
         _mint(account, id, amount, data);
     }
 
@@ -37,7 +36,7 @@ contract MultiToken is ERC1155, Ownable {
         uint256[] memory ids,
         uint256[] memory amounts,
         bytes memory data
-    ) public onlyOwner {
+    ) public {
         _mintBatch(to, ids, amounts, data);
     }
 
