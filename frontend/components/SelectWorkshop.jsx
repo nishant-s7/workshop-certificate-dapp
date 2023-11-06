@@ -8,7 +8,12 @@ import contractABI from "../contracts/MultiToken.json";
 
 const animatedComponents = makeAnimated();
 
-const SelectWorkshop = ({ address, setLoading, setTransactionHash }) => {
+const SelectWorkshop = ({
+  address,
+  setLoading,
+  setStatus,
+  setTransactionHash,
+}) => {
   const [attended, setAttended] = useState([]);
   const [candidateAdd, setCandidateAdd] = useState("");
 
@@ -20,46 +25,62 @@ const SelectWorkshop = ({ address, setLoading, setTransactionHash }) => {
     { value: "5", label: "NodeJS Workshop" },
   ];
 
-  const sendNFTs = async (ids, amounts) => {
+  const sendNFTs = async (ids, amounts, receiverMsg) => {
     const provider = new ethers.BrowserProvider(window.ethereum);
 
-    console.log(provider);
     const signer = new JsonRpcSigner(provider, address);
-    console.log(signer);
 
     const contract = new ethers.Contract(
       contractAddress.MultiToken,
       contractABI.abi,
       signer
     );
-    console.log(contract);
 
-    const transaction = await contract.mintBatch(
-      candidateAdd,
-      ids,
-      amounts,
-      "0x00"
-    );
+    const msg =
+      "0x" +
+      Array.from(new TextEncoder().encode(receiverMsg), (byte) => {
+        return ("0" + (byte & 0xff).toString(16)).slice(-2);
+      }).join("");
 
-    // Get the transaction hash (ID)
-    const txHash = transaction.hash;
-    console.log("Transaction Hash:", txHash);
+    try {
+      setStatus("Waiting for receiver to sign");
+      await window.ethereum.request({
+        method: "personal_sign",
+        params: [msg, address],
+      });
 
-    // Wait for the transaction to be mined (optional)
-    const receipt = await transaction.wait();
-    setTransactionHash(txHash);
-    setLoading(false);
-    console.log("Transaction Receipt:", receipt);
+      setStatus("Sending NFTs...");
+
+      const transaction = await contract.mintBatch(
+        candidateAdd,
+        ids,
+        amounts,
+        "0x00"
+      );
+
+      const txHash = transaction.hash;
+      console.log("Transaction Hash:", txHash);
+
+      const receipt = await transaction.wait();
+      setTransactionHash(txHash);
+      setLoading(false);
+      console.log("Transaction Receipt:", receipt);
+    } catch (error) {
+      setStatus("Receiver refused to accept");
+      setLoading(false);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const ids = attended.map((attended) => attended.value);
+    const labels = attended.map((w) => w.label).toString();
+    const receiverMsg = `You are receiving NFTs for ${labels} for attending them. Do you confirm?`;
+    const ids = attended.map((w) => w.value);
     const amounts = Array(ids.length).fill(1);
 
-    sendNFTs(ids, amounts);
+    sendNFTs(ids, amounts, receiverMsg);
   };
 
   return (

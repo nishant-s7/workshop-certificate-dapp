@@ -9,6 +9,7 @@ function App() {
   const [metamaskConnected, setMetamaskConnected] = useState(false);
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
   const [transactionHash, setTransactionHash] = useState("");
 
   return (
@@ -19,25 +20,32 @@ function App() {
         setAddress={setAddress}
       />
       {loading ? (
-        <BallTriangle
-          height={50}
-          width={50}
-          radius={5}
-          color="orange"
-          ariaLabel="ball-triangle-loading"
-          wrapperClass="loader"
-          wrapperStyle=""
-          visible={true}
-        />
-      ) : metamaskConnected && (transactionHash === "" ? (
-        <SelectWorkshop
-          address={address}
-          setLoading={setLoading}
-          setTransactionHash={setTransactionHash}
-        />
+        <>
+          <BallTriangle
+            height={50}
+            width={50}
+            radius={5}
+            color="orange"
+            ariaLabel="ball-triangle-loading"
+            wrapperClass="loader"
+            wrapperStyle=""
+            visible={true}
+          />
+          <p className="orange">{status}</p>
+        </>
       ) : (
-        <h4 className="green">Transaction Hash: {transactionHash}</h4>
-      ))}
+        metamaskConnected &&
+        (transactionHash === "" ? (
+          <SelectWorkshop
+            address={address}
+            setLoading={setLoading}
+            setStatus={setStatus}
+            setTransactionHash={setTransactionHash}
+          />
+        ) : (
+          <h4 className="green">Transaction Hash: {transactionHash}</h4>
+        ))
+      )}
     </>
   );
 }
