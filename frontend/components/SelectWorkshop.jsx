@@ -140,7 +140,7 @@ const SelectWorkshop = ({
             }),
           }}
         />
-        <button type="submit">Get certificates</button>
+        <button type="submit">Send certificates</button>
       </form>
     </>
   );
